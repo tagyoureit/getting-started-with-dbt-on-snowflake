@@ -3,6 +3,7 @@ run-name: PR from ${{ github.actor }} accepted - triggered a ${{ github.event_na
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
