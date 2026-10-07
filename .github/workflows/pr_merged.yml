@@ -3,6 +3,7 @@ run-name: PR from ${{ github.actor }} accepted - triggered a ${{ github.event_na
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -37,11 +38,12 @@ jobs:
       # The -x is shorthand for --temporary-connection
       - run: snow connection test -x
 
-      # The --force setting creates the object or updates it if it already exists
+      # Updates the live version of the existing TASTY_BYTES_DBT_PROJECT in place (keeps run history).
+      # Don't add --force: it runs CREATE OR REPLACE DBT PROJECT, which may remove run history.
       # You can remove the "--source" flag if your dbt_project.yml is at root of your repo
       # The --default-target flag ensures the dbt project object compiles and executes with your prod target
       - name: Create a new dbt project object in ${{ vars.SNOWFLAKE_DATABASE }}.${{ vars.SNOWFLAKE_SCHEMA }}
-        run: snow dbt deploy tasty_bytes_dbt_object_gh_action --source ./tasty_bytes --default-target prod --dbt-version 1.10.15 --force -x
+        run: snow dbt deploy tasty_bytes_dbt_project --source ./tasty_bytes_dbt_demo --external-access-integration DBT_EXT_ACCESS --default-target prod --dbt-version 1.10.15 -x
 
       - name: List all of the snowflake dbt project objects on your account
         run: snow dbt list -x
